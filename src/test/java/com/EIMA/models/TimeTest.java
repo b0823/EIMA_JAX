@@ -1,6 +1,8 @@
-package com.example.models;
+package com.EIMA.models;
 
 import org.junit.Test;
+
+import com.EIMA.models.Time;
 
 import java.util.TimeZone;
 

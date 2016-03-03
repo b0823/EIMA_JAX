@@ -1,4 +1,4 @@
-package com.example.models;
+package com.EIMA.models;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Calendar;
@@ -14,7 +14,7 @@ public class Time {
     private final int hour;
     private final int minute;
     private final int second;
-
+    
     public Time() {
         this(TimeZone.getDefault());
     }

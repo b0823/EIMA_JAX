@@ -1,11 +1,11 @@
-package com.example.services;
-
-import com.example.models.Time;
+package com.EIMA.services;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+
+import com.EIMA.models.Time;
 
 @Path("/time")
 @Produces(MediaType.APPLICATION_JSON)
