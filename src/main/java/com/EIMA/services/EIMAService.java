@@ -17,7 +17,7 @@ import com.EIMA.models.Validate;
 
 @Path("/EIMA")
 @Produces(MediaType.APPLICATION_JSON)
-public class TimeService {
+public class EIMAService {
 
 	@GET
 	public Time get() {
