@@ -2,6 +2,7 @@ package com.EIMA.services;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -30,7 +31,7 @@ public class EIMAService {
 		return new Time(TimeZone.getTimeZone(timezone.toUpperCase()));
 	}
 
-	@PUT
+	@POST
 	@Consumes(MediaType.TEXT_PLAIN)
 	@Path("/validate")
 	public Validate putExample(String json) throws JSONException {				
