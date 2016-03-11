@@ -1,7 +1,6 @@
-# JAX-RS Template Application
+# EIMA JAX-RS REST API
 
-This is a template for a lightweight RESTful API using JAX-RS. The sample code is a call for getting the current time.
-    
+
 ## Running the application locally
 
 First build with:
@@ -10,5 +9,8 @@ First build with:
 
 Then run it with:
 
-    $ java -cp target/classes:target/dependency/* com.EIMA.Main
-
+OS X/Linux    $ java -cp target/classes:target/dependency/* com.EIMA.Main
+Windows       > java -cp "target\classes;target\dependency\*" "com.EIMA.Main" 
+    
+    
+## Alternatively import into eclipse -- run via main class
