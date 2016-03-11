@@ -10,8 +10,10 @@ First build with:
 Then run it with:
 
 OS X/Linux:
+
     $ java -cp target/classes:target/dependency/* com.EIMA.Main
 Windows:
+
     > java -cp "target\classes;target\dependency\*" "com.EIMA.Main" 
 
     
