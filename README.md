@@ -1,6 +1,6 @@
 # EIMA JAX-RS REST API
 
-##This application is a Java Jersey Server that auto-deploys to https://eima-server.herokuapp.com/ 
+###This application is a Java Jersey Server that auto-deploys to https://eima-server.herokuapp.com/ 
 
 ## Running the application locally
 
