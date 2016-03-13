@@ -32,7 +32,11 @@
             <artifactId>jersey-json</artifactId>
             <version>1.8</version>
         </dependency>
-
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>9.4-1201-jdbc41</version>
+		</dependency>
         <!-- jUnit -->
         <dependency>
             <groupId>junit</groupId>
