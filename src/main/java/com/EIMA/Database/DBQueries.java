@@ -17,7 +17,7 @@ public class DBQueries {
 	 * http://www.java2novice.com/jdbc/prepared-statement/
 	 */
 	public static boolean validateLogin(String uname, String pwd) {
-		return false;
+		return true;
 	}
 
 	public static String getUserCurrIncidentPrivLevel(String token) {
@@ -28,6 +28,11 @@ public class DBQueries {
 	public static int getUserCurrentIncident(String token) {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	public static void setUserToken(String uname, String theirToken) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

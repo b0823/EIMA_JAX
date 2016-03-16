@@ -1,7 +1,5 @@
 package com.EIM.auth;
 
-import java.util.concurrent.TimeUnit;
-
 import com.EIMA.Database.DBQueries;
 
 import java.util.UUID;
@@ -49,7 +47,7 @@ public class AuthUtils {
 	}
 
 	public static String generateToken() {
-		long a = TimeUnit.NANOSECONDS.toMicros(System.nanoTime());
+		long a = System.currentTimeMillis();
 		String uuid = UUID.randomUUID().toString();
 
 		StringBuilder token = new StringBuilder();

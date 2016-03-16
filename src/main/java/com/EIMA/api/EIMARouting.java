@@ -6,10 +6,14 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
+import com.EIM.auth.AuthUtils;
+import com.EIMA.Database.DBQueries;
 import com.EIMA.outputs.AccessResult;
 import com.EIMA.outputs.CreateIncidentResult;
+import com.EIMA.outputs.LoginResult;
 import com.EIMA.outputs.MapDataResult;
 import com.EIMA.outputs.ResultBase;
 import com.EIMA.outputs.UserListResult;
@@ -23,54 +27,62 @@ public class EIMARouting {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/auth/login")
 	public ResultBase login(JSONObject json) {
-
-		return null;
+		try {
+			String uname = json.getString("username");
+			if (AuthUtils.login(uname, json.getString("password"))) {
+				String theirToken = AuthUtils.generateToken();
+				DBQueries.setUserToken(uname, theirToken);
+				return new LoginResult(true, theirToken);
+			}
+		} catch (JSONException e) {
+			return new ResultBase(false);
+		}
+		return new ResultBase(false);
 	}
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/auth/logout")
 	public ResultBase logout(JSONObject json) {
-		return null;
+
+		return new ResultBase(false);
 	}
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/auth/validatetoken")
 	public ResultBase validateToken(JSONObject json) {
-		return null;
-
+		return new ResultBase(false);
 	}
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/auth/validateprivilege")
 	public ResultBase validatePrivilege(JSONObject json) {
-		return null;
-
+		return new ResultBase(false);
 	}
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/incidentaccess/join")
 	public ResultBase joinIncident(JSONObject json) {
-		return null;
+		return new ResultBase(false);
 
 	}
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/incidentaccess/create")
-	public CreateIncidentResult create(JSONObject json) {
-		return null;
+	public ResultBase create(JSONObject json) {
+		return new ResultBase(false);
 
 	}
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/incidentaccess/createstandalone")
-	public CreateIncidentResult createStandalone(JSONObject json) {
-		return null;
+	public ResultBase createStandalone(JSONObject json) {
+		return new ResultBase(false);
 
 	}
 
@@ -78,15 +90,15 @@ public class EIMARouting {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/incidentaccess/leave")
 	public ResultBase leave(JSONObject json) {
-		return null;
+		return new ResultBase(false);
 
 	}
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/users/getprofile")
-	public UserProfileResult getProfile(JSONObject json) {
-		return null;
+	public ResultBase getProfile(JSONObject json) {
+		return new ResultBase(false);
 
 	}
 
@@ -94,7 +106,7 @@ public class EIMARouting {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/users/setprofile")
 	public ResultBase setProfile(JSONObject json) {
-		return null;
+		return new ResultBase(false);
 
 	}
 
@@ -102,23 +114,23 @@ public class EIMARouting {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/users/registeruser")
 	public ResultBase registerUser(JSONObject json) {
-		return null;
+		return new ResultBase(false);
 
 	}
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/incidentdata/mapdata")
-	public MapDataResult getMapData(JSONObject json) {
-		return null;
+	public ResultBase getMapData(JSONObject json) {
+		return new ResultBase(false);
 
 	}
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/incidentdata/accesslevel")
-	public AccessResult getAccessLevel(JSONObject json) {
-		return null;
+	public ResultBase getAccessLevel(JSONObject json) {
+		return new ResultBase(false);
 
 	}
 
@@ -126,7 +138,7 @@ public class EIMARouting {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/incidentdata/location")
 	public ResultBase location(JSONObject json) {
-		return null;
+		return new ResultBase(false);
 
 	}
 
@@ -134,15 +146,15 @@ public class EIMARouting {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/mapedit/addassetinfo")
 	public ResultBase addAssetInfo(JSONObject json) {
-		return null;
+		return new ResultBase(false);
 
 	}
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/admin/userlist")
-	public UserListResult userList(JSONObject json) {
-		return null;
+	public ResultBase userList(JSONObject json) {
+		return new ResultBase(false);
 
 	}
 
@@ -150,7 +162,7 @@ public class EIMARouting {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/admin/sendmessage")
 	public ResultBase sendMessage(JSONObject json) {
-		return null;
+		return new ResultBase(false);
 
 	}
 
@@ -158,7 +170,7 @@ public class EIMARouting {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/admin/editprivilege")
 	public ResultBase editPrivilege(JSONObject json) {
-		return null;
+		return new ResultBase(false);
 
 	}
 }
