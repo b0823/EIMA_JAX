@@ -55,19 +55,18 @@ public class AuthUtils {
 		StringBuilder token = new StringBuilder();
 
 		token.append(convertHex(a));
+		token.append("-");
 		token.append(uuid);
 
 		return token.toString();
 	}
 
 	public static String usersCurrentPrivLevel(String token) {
-		// would call a DB function to get users current incident
-		return null;
+		return DBQueries.getUserCurrIncidentPrivLevel(token);
 	}
 
 	public static int usersCurrentIncident(String token) {
-		// would call a DB function to get users current incident
-		return 1;
+		return DBQueries.getUserCurrentIncident(token);
 	}
 
 	private static String convertHex(long n) {

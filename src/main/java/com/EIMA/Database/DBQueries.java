@@ -20,4 +20,14 @@ public class DBQueries {
 		return false;
 	}
 
+	public static String getUserCurrIncidentPrivLevel(String token) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static int getUserCurrentIncident(String token) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 }
