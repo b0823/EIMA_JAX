@@ -68,13 +68,6 @@ public class EIMARouting {
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-	@Path("/auth/validateprivilege")
-	public ResultBase validatePrivilege(JSONObject json) {
-		return new ResultBase(false);
-	}
-
-	@POST
-	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/incidentaccess/join")
 	public ResultBase joinIncident(JSONObject json) {
 		try {
@@ -286,7 +279,7 @@ public class EIMARouting {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/mapedit/addassetinfo")
 	public ResultBase addAssetInfo(JSONObject json) {
-		return new ResultBase(false);
+		return new ResultBase(false); //TODO
 
 	}
 

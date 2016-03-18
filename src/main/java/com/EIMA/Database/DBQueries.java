@@ -7,21 +7,9 @@ import com.EIMA.models.*;
 
 public class DBQueries {
 
-	/**
-	 * Takes username/password. returns a true false value. This SHOULD use a
-	 * Prepared statement to Prevent SQL injection. This is important. Other
-	 * queries don't require this as non of their input makes it to the actual
-	 * SQL statement exception of token validation (I think).
-	 * 
-	 * http://www.theserverside.com/news/1365244/Why-Prepared-Statements-are-
-	 * important-and-how-to-use-them-properly
-	 * http://stackoverflow.com/questions/24692296/how-to-use-prepared-statement
-	 * -for-select-query-in-java
-	 * http://www.java2novice.com/jdbc/prepared-statement/
-	 */
-	public static boolean validateLogin(String uname, String pwd) {
-		return true;
-	}
+	////////////////////////////////////////////////////////
+	//////// UTILITY FUNCTIONS//////////////////////////////
+	////////////////////////////////////////////////////////
 
 	// Checks the active tokens list and sees if the provided is active
 	// This must also use a prepared statement. This should be called by other
@@ -43,6 +31,31 @@ public class DBQueries {
 		return 0;
 	}
 
+	/**
+	 * Takes username/password. returns a true false value. This SHOULD use a
+	 * Prepared statement to Prevent SQL injection. This is important. Other
+	 * queries don't require this as non of their input makes it to the actual
+	 * SQL statement exception of token validation (I think).
+	 * 
+	 * http://www.theserverside.com/news/1365244/Why-Prepared-Statements-are-
+	 * important-and-how-to-use-them-properly
+	 * http://stackoverflow.com/questions/24692296/how-to-use-prepared-statement
+	 * -for-select-query-in-java
+	 * http://www.java2novice.com/jdbc/prepared-statement/
+	 */
+	public static boolean validateLogin(String uname, String pwd) {
+		return true;
+	}
+
+	// Verifys and incident ID is valid return true/false.
+	public static boolean isValidIncident(int incidentID) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	////////////////////////////////////////////////////////
+	//////// Core Data Modifications Functions /////////////
+	////////////////////////////////////////////////////////
+
 	// Sets a user's active token, for a login action.
 	public static void setUserToken(String uname, String theirToken) {
 		// TODO Auto-generated method stub
@@ -60,12 +73,6 @@ public class DBQueries {
 	public static void addUserToIncident(int incidentID, String token) {
 		// TODO Auto-generated method stub
 
-	}
-
-	// Verifys and incident ID is valid return true/false.
-	public static boolean isValidIncident(int incidentID) {
-		// TODO Auto-generated method stub
-		return false;
 	}
 
 	// Creates a new incident with blank data, returns a integer of the created
