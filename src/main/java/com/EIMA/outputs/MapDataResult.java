@@ -4,15 +4,16 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import com.EIMA.models.EIMAAsset;
 import com.EIMA.models.EIMACircle;
+import com.EIMA.models.EIMAPolygon;;
 
 @XmlRootElement
 
 public class MapDataResult extends ResultBase {
 	private EIMAAsset[] mapAssets;
 	private EIMACircle[] mapCircles;
-	private EIMACircle[] mapPolygons;
+	private EIMAPolygon[] mapPolygons;
 
-	public MapDataResult(boolean result, EIMAAsset[] mapAssets, EIMACircle[] mapCircles, EIMACircle[] mapPolygons) {
+	public MapDataResult(boolean result, EIMAAsset[] mapAssets, EIMACircle[] mapCircles, EIMAPolygon[] mapPolygons) {
 		super(result);
 		this.mapAssets = mapAssets;
 		this.mapCircles = mapCircles;
@@ -35,11 +36,11 @@ public class MapDataResult extends ResultBase {
 		this.mapCircles = mapCircles;
 	}
 
-	public EIMACircle[] getMapPolygons() {
+	public EIMAPolygon[] getMapPolygons() {
 		return mapPolygons;
 	}
 
-	public void setMapPolygons(EIMACircle[] mapPolygons) {
+	public void EIMAPolygon(EIMAPolygon[] mapPolygons) {
 		this.mapPolygons = mapPolygons;
 	}
 

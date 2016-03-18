@@ -1,4 +1,4 @@
-package com.EIM.auth;
+package com.EIMA.auth;
 
 import com.EIMA.Database.DBQueries;
 
@@ -7,7 +7,7 @@ import java.util.UUID;
 public class AuthUtils {
 
 	public static enum Privlege {
-		NO_ACCESS, USER, MAP_EDITOR, ADMIN
+		noAccess, user, mapEditor, admin
 	}
 
 	public static boolean login(String uname, String pwd) {
@@ -15,36 +15,24 @@ public class AuthUtils {
 	}
 
 	public static boolean hasPrivlege(String token, Privlege requiredPriv) {
-		Privlege usersP = getUserPrivleges(token);
+		Privlege usersP = usersCurrentPrivLevel(token);
 
 		// Admin
-		if (requiredPriv.equals(Privlege.ADMIN)) {
-			return usersP.equals(Privlege.ADMIN);
+		if (requiredPriv.equals(Privlege.admin)) {
+			return usersP.equals(Privlege.admin);
 		}
 		// MapEditor
-		if (requiredPriv.equals(Privlege.MAP_EDITOR)) {
-			return usersP.equals(Privlege.ADMIN) || usersP.equals(Privlege.MAP_EDITOR);
+		if (requiredPriv.equals(Privlege.mapEditor)) {
+			return usersP.equals(Privlege.admin) || usersP.equals(Privlege.mapEditor);
 		}
 		// User
-		if (requiredPriv.equals(Privlege.MAP_EDITOR)) {
-			return usersP.equals(Privlege.ADMIN) || usersP.equals(Privlege.MAP_EDITOR) || usersP.equals(Privlege.USER);
+		if (requiredPriv.equals(Privlege.mapEditor)) {
+			return usersP.equals(Privlege.admin) || usersP.equals(Privlege.mapEditor) || usersP.equals(Privlege.user);
 		}
 		// NoAccess
 		return true;
 	}
 
-	public static Privlege getUserPrivleges(String token) {
-		String priv = usersCurrentPrivLevel(token);
-
-		if (priv == "Admin") {
-			return Privlege.ADMIN;
-		} else if (priv == "Map Editor") {
-			return Privlege.MAP_EDITOR;
-		} else if (priv == "User") {
-			return Privlege.USER;
-		}
-		return Privlege.NO_ACCESS;
-	}
 
 	public static String generateToken() {
 		long a = System.currentTimeMillis();
@@ -59,7 +47,7 @@ public class AuthUtils {
 		return token.toString();
 	}
 
-	public static String usersCurrentPrivLevel(String token) {
+	private static Privlege usersCurrentPrivLevel(String token) {
 		return DBQueries.getUserCurrIncidentPrivLevel(token);
 	}
 
