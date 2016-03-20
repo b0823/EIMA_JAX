@@ -1,5 +1,8 @@
 package com.EIMA.models;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 public class EIMAAlert {
 	private String message;
 	private String sender;

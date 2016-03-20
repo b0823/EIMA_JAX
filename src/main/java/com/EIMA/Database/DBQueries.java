@@ -16,13 +16,13 @@ public class DBQueries {
 	// statements to verify
 	public static boolean tokenIsValid(String token) {
 		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	// Gets the Privlege level of a user in their current incident
 	public static AuthUtils.Privlege getUserCurrIncidentPrivLevel(String token) {
 		// TODO Auto-generated method stub
-		return null;
+		return AuthUtils.Privlege.admin;
 	}
 
 	// gets the incident Id for the current incident a user is in
@@ -50,7 +50,7 @@ public class DBQueries {
 	// Verifys and incident ID is valid return true/false.
 	public static boolean isValidIncident(int incidentID) {
 		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 	////////////////////////////////////////////////////////
 	//////// Core Data Modifications Functions /////////////
@@ -95,7 +95,7 @@ public class DBQueries {
 	// Returns true if a user is in an incident, false if not.
 	public static boolean userIsInIncident(String token) {
 		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	// Removes a user from incident. Called when a user 'leaves'
@@ -111,16 +111,15 @@ public class DBQueries {
 	}
 
 	// Sets a user profile based on data sent from user.
-	public static EIMAProfile setUserProfile(String token, EIMAProfile profile) {
+	public static void setUserProfile(String token, EIMAProfile profile) {
 		// TODO Auto-generated method stub
-		return null;
 	}
 
 	// Adds a user to the userlist. Returns true if succesful, false if name is
 	// taken.
 	public static boolean registerUser(String uname, String password) {
 		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	// Gets Assets of an incident
@@ -150,7 +149,7 @@ public class DBQueries {
 	// Gets user list from incident.
 	public static EIMAUser[] getUserList(String token) {
 		// TODO Auto-generated method stub
-		return null;
+		return new EIMAUser[]{};
 	}
 
 	// Adds a message to a user. Uses other persons username.
@@ -163,7 +162,7 @@ public class DBQueries {
 	// "user" "mapEditor" "admin"), you can't edit your own privlege level
 	public static boolean modifyPrivlege(String token, String username, String privLevel) {
 		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	// Gets a list of all alerts a person has recieved.
