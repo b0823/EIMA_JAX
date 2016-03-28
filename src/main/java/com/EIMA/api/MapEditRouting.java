@@ -25,9 +25,12 @@ public class MapEditRouting {
 
 			if (DBQueries.tokenIsValid(token) && DBQueries.userIsInIncident(token)
 					&& AuthUtils.hasPrivlege(token, AuthUtils.Privlege.mapEditor)) {
-				//Todo parse data and edit
+
+				DBQueries.updateMapAsset(null);
+				DBQueries.deleteMapAsset(null);
+				DBQueries.addMapAsset(null);
 				return new ResultBase(true);
-				
+
 			}
 
 		} catch (JSONException e) {

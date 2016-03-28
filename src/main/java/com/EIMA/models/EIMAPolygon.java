@@ -4,13 +4,15 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 
-public class EIMAPolygon {
+public class EIMAPolygon extends MapAsset{
+	private String uid;
 	private GPSPosition[] points;
 	private String type;
 	private String note;
 
-	public EIMAPolygon(GPSPosition[] points, String type, String note) {
+	public EIMAPolygon(String uid, GPSPosition[] points, String type, String note) {
 		super();
+		this.setUid(uid);
 		this.points = points;
 		this.type = type;
 		this.note = note;
@@ -42,6 +44,14 @@ public class EIMAPolygon {
 
 	public void setNote(String note) {
 		this.note = note;
+	}
+
+	public String getUid() {
+		return uid;
+	}
+
+	public void setUid(String uid) {
+		this.uid = uid;
 	}
 
 }

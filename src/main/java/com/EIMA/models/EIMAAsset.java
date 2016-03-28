@@ -3,8 +3,8 @@ package com.EIMA.models;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
-public class EIMAAsset {
-	private String username;
+public class EIMAAsset extends MapAsset {
+	private String uid; //THIS is either their username or their randomly generated id.
 	private String name;
 	private String unit;
 	private String organization;
@@ -19,7 +19,7 @@ public class EIMAAsset {
 	public EIMAAsset(String username, String name, String unit, String organization, String status, String unitType,
 			boolean isUser) {
 		super();
-		this.username = username;
+		this.uid = username;
 		this.name = name;
 		this.unit = unit;
 		this.organization = organization;
@@ -37,11 +37,11 @@ public class EIMAAsset {
 	}
 
 	public String getUsername() {
-		return username;
+		return uid;
 	}
 
 	public void setUsername(String username) {
-		this.username = username;
+		this.uid = username;
 	}
 
 	public String getName() {

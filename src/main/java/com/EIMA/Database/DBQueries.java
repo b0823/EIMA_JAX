@@ -149,7 +149,7 @@ public class DBQueries {
 	// Gets user list from incident.
 	public static EIMAUser[] getUserList(String token) {
 		// TODO Auto-generated method stub
-		return new EIMAUser[]{};
+		return new EIMAUser[] {};
 	}
 
 	// Adds a message to a user. Uses other persons username.
@@ -169,6 +169,27 @@ public class DBQueries {
 	public static EIMAAlert[] getAlerts(String token) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	// MapAsset is an a super class for polygons, circles and pins. actions
+	// dependent on what might have to use instance of or call other funcitons
+	// if you want to structure it a certain way.
+	// Deletes the asset from the map.
+	public static void deleteMapAsset(MapAsset a) {
+		// TODO Auto-generated method stub
+
+	}
+
+	// Updates the data of an asset.
+	public static void updateMapAsset(MapAsset a) {
+		// TODO Auto-generated method stub
+
+	}
+
+	// Adds a new asset to the map.
+	public static void addMapAsset(MapAsset a) {
+		// TODO Auto-generated method stub
+
 	}
 
 }
