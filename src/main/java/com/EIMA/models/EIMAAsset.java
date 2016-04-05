@@ -6,6 +6,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class EIMAAsset extends MapAsset {
 	private String uid; //THIS is either their username or their randomly generated id.
 	private String name;
+	private GPSPosition position;
 	private String unit;
 	private String organization;
 	private String status;
