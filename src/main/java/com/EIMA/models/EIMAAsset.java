@@ -17,10 +17,11 @@ public class EIMAAsset extends MapAsset {
 		super();
 	}
 
-	public EIMAAsset(String username, String name, String unit, String organization, String status, String unitType,
+	public EIMAAsset(String username, String name, String unit, GPS position, String organization, String status, String unitType,
 			boolean isUser) {
 		super();
 		this.uid = username;
+		this.position = position;
 		this.name = name;
 		this.unit = unit;
 		this.organization = organization;
@@ -75,6 +76,14 @@ public class EIMAAsset extends MapAsset {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public GPSPosition getPosition() {
+		return position;
+	}
+
+	public void setPosition(GPS position) {
+		this.position = position;
 	}
 
 	public String getUnitType() {
