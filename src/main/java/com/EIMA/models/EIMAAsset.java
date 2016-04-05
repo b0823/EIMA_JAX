@@ -82,7 +82,7 @@ public class EIMAAsset extends MapAsset {
 		return position;
 	}
 
-	public void setPosition(GPS position) {
+	public void setPosition(GPSPosition position) {
 		this.position = position;
 	}
 
