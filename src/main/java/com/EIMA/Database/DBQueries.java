@@ -1,8 +1,10 @@
 package com.EIMA.Database;
 
+import java.sql.Array;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Time;
 import java.util.ArrayList;
 
 import com.EIMA.auth.AuthUtils;
@@ -209,7 +211,7 @@ public class DBQueries {
             
             EIMAProfile user = getUserProfile(token);
             EIMAAsset userAsset = new EIMAAsset(
-            		user.getName(),user.getName(),user.getUnit(),
+            		user.getName(),user.getName(),user.getUnit(), null,
             		user.getOrganization(),user.getStatus(),user.getUnitType(),
             		true
             );
@@ -282,16 +284,17 @@ public class DBQueries {
 	// Removes a user from incident. Called when a user 'leaves'
 	public static void removeUserFromIncident(String token) {
 		Connection db = DBConnection.getConnection();
-		String sql = "Update Users set current_incident=null where token=" + sq(token) + ";";
-		try {
-			db.createStatement().execute(sql);
-		} catch (SQLException e) {
-            e.printStackTrace();
-            System.out.println("error: " + e.getErrorCode());
-        }
-		int incident = getUserCurrentIncident(token);
-		int member = getMemberId(token);
-		int objectId = -1;
+		
+		//int incident = getUserCurrentIncident(token);
+		//int member = getMemberId(token);
+		EIMAProfile profile = getUserProfile(token);
+		EIMAAsset user = new EIMAAsset();
+		user.setName(profile.getName());
+		user.setUsername(profile.getName());
+		user.setUser(true);
+		deleteMapAsset(user, token);
+		
+		/*int objectId = -1;
 		sql = "Select object_id from Map_objects where " +
 				"incident=" + incident +
 				" and incident_member=" + member + ";";
@@ -303,16 +306,24 @@ public class DBQueries {
 		} catch (SQLException e) {
             e.printStackTrace();
             System.out.println("error: " + e.getErrorCode());
-        }
-		sql = "Update Map_objects set gps_x=null,gps_y=null,radius=null,x_array=null,y_array=null,notes=null " +
+        }*/
+		/*sql = "Update Map_objects set gps_x=null,gps_y=null,radius=null,x_array=null,y_array=null,notes=null " +
 				"where object_id=" + objectId + ";";
 		try {
 			db.createStatement().execute(sql);
 		} catch (SQLException e) {
             e.printStackTrace();
             System.out.println("error: " + e.getErrorCode());
-        }
+        }*/
+		
 		logout(token);
+		String sql = "Update Users set current_incident=null where token=" + sq(token) + ";";
+		try {
+			db.createStatement().execute(sql);
+		} catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("error: " + e.getErrorCode());
+        }
 	}
 
 	// Gets a user profile from a user's token, see EIMA PROFILE for formatting
@@ -394,14 +405,24 @@ public class DBQueries {
                 String status = rs.getString("status");
                 String unit_type = rs.getString("unit_type");
                 String member = rs.getString("incident_member");
+                String x = rs.getString("gps_x");
+                String y = rs.getString("gps_y");
                 boolean isUser = member != null;
-                assets.add(new EIMAAsset(id, name, unit, org, status, unit_type, isUser));
+                if (x != null && y != null) {
+                	int xCoord = Integer.parseInt(x);
+                	int yCoord = Integer.parseInt(y);
+                	assets.add(new EIMAAsset(id, name, unit, new GPSPosition(xCoord,yCoord), org, status, unit_type, isUser));
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("error: " + e.getErrorCode());
         }
-		return (EIMAAsset[]) assets.toArray();
+        EIMAAsset[] arr = new EIMAAsset[assets.size()];
+        for (int i = 0; i < arr.length; i++) {
+        	arr[i] = assets.get(i);
+        }
+		return arr;
 	}
 
 	// Gets Circles of an incident
@@ -432,19 +453,70 @@ public class DBQueries {
             e.printStackTrace();
             System.out.println("error: " + e.getErrorCode());
         }
-		return (EIMACircle[]) circles.toArray();
+        EIMACircle[] arr = new EIMACircle[circles.size()];
+        for (int i = 0; i < arr.length; i++) {
+        	arr[i] = circles.get(i);
+        }
+		return arr;
 	}
 
 	// Gets Polygons of an incident
 	public static EIMAPolygon[] getPolygons(String token) {
-		// TODO Auto-generated method stub
-		return null;
+		ArrayList<EIMAPolygon> polygons = new ArrayList<EIMAPolygon>();
+		int incidentId = getUserCurrentIncident(token);
+		Connection db = DBConnection.getConnection();
+		String sql = "Select client_side_id, x_arry, y_array, zone_type, notes, from " +
+				"Map_objects where incident_id=" + incidentId + " and " +
+				"icon_type == 'poly';";
+        try {
+            ResultSet rs = db.createStatement().executeQuery(sql);
+            while(rs.next()){
+                String id = rs.getString("client_side_id");
+                double[] xArr = (double[]) rs.getArray("x_array").getArray();
+                double[] yArr = (double[]) rs.getArray("y_array").getArray();
+                String type = rs.getString("zone_type");
+                String notes = rs.getString("notes");
+                if (xArr != null && xArr.length > 0) {
+                	GPSPosition[] coords = new GPSPosition[xArr.length];
+                	for (int i = 0; i < coords.length; i++) {
+                		coords[i] = new GPSPosition(xArr[i], yArr[i]);
+                	}
+                	polygons.add(new EIMAPolygon(id, coords, type, notes));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("error: " + e.getErrorCode());
+        }
+        EIMAPolygon[] arr = new EIMAPolygon [polygons.size()];
+        for (int i = 0; i < arr.length; i++) {
+        	arr[i] = polygons.get(i);
+        }
+		return arr;
 	}
 
 	// Updates the user's location within the incident
 	public static void updateUserLocation(String token, GPSPosition location) {
-		// TODO Auto-generated method stub
-
+		Connection db = DBConnection.getConnection();
+		int member = getMemberId(token);
+		String sql = "Select client_side_id, unit, organization, status, unit_type, asset_name from " +
+				"Map_objects incident_member=" + member + ";";
+        try {
+            ResultSet rs = db.createStatement().executeQuery(sql);
+            while(rs.next()){
+                String clientSideId = rs.getString("client_side_id");
+                String unit = rs.getString("unit");
+                String organization = rs.getString("organization");
+                String status = rs.getString("status");
+                String unitType = rs.getString("unit_type");
+                String assetName = rs.getString("asset_name");
+                EIMAAsset asset = new EIMAAsset(clientSideId, assetName, unit, location, organization, status, unitType, true);
+                updateMapAsset(asset, token);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("error: " + e.getErrorCode());
+        }
 	}
 
 	// Gets user list from incident.
@@ -470,7 +542,11 @@ public class DBQueries {
             e.printStackTrace();
             System.out.println("error: " + e.getErrorCode());
         }
-		return (EIMAUser[]) users.toArray();
+        EIMAUser[] arr = new EIMAUser[users.size()];
+        for (int i = 0; i < arr.length; i++) {
+        	arr[i] = users.get(i);
+        }
+		return arr;
 	}
 
 	// Adds a message to a user. Uses other persons username.
@@ -482,13 +558,14 @@ public class DBQueries {
             int recipient  = -1;
             sql = "Select incident_member from " +
             		"Members m inner join Users u on m.incident_id = u.current_incident " +
-            		"where u.uname=" + sq(user) + " limit 1;";
+            		"and m.uid=u.uid " +
+            		"where u.uname=" + sq(user) + ";";
             ResultSet rs = db.createStatement().executeQuery(sql);
             while(rs.next()){
                 recipient = rs.getInt(1);
             }
             sql = "Insert into Message_events values (" +
-            		event + "," + recipient + "," + sq(message) + ";";
+            		event + "," + recipient + "," + sq(message) + ");";
             db.createStatement().execute(sql);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -512,9 +589,10 @@ public class DBQueries {
 	        		return false;
 	        	}
         	int recipientId = -1;
+        	int incident = getUserCurrentIncident(token);
         	sql = "Select incident_member from " +
     				"Members inner join Users on Members.incident_id=Users.current_incident "+
-    				"where Users.uname=" + sq(username) + " limit 1;";
+    				"where Users.uname=" + sq(username) + " and Members.incident_id=" + incident + ";";
             rs = db.createStatement().executeQuery(sql);
             while(rs.next()){
             	recipientId = rs.getInt(1);
@@ -541,15 +619,15 @@ public class DBQueries {
 		Connection db = DBConnection.getConnection();
 		String sql = "";
         try {
-        	int member = -1;
+        	/*int member = -1;
         	sql = "Select incident_member from " +
     				"Members inner join Users on Members.incident_id=Users.current_incident "+
     				"where Users.token=" + sq(token) + " limit 1;";
             ResultSet rs = db.createStatement().executeQuery(sql);
             while(rs.next()){
             	member = rs.getInt(1);
-            }
-            
+            }*/
+            int member = getMemberId(token);
             int incidentId = getUserCurrentIncident(token);
             
             sql = "Select Users.uname, Events.time, Message_events.message from " +
@@ -558,11 +636,11 @@ public class DBQueries {
             		"inner join Message_events on Events.event_id=Message_events.event_id " +
             		"where Members.incident_id=" + incidentId +
             		" and (Message_events.recipient=" + member +
-            		" or Message_events.recipient is null;";
-            rs = db.createStatement().executeQuery(sql);
+            		" or Message_events.recipient is null);";
+            ResultSet rs = db.createStatement().executeQuery(sql);
             while (rs.next()) {
             	String uname = rs.getString(1);
-            	Long time = rs.getLong(2);
+            	long time = rs.getLong(2);
             	String msg = rs.getString(3);
             	alerts.add(new EIMAAlert(msg, uname, time));
             }
@@ -570,7 +648,12 @@ public class DBQueries {
             e.printStackTrace();
             System.out.println("error: " + e.getErrorCode());
         }
-		return (EIMAAlert[]) alerts.toArray();
+        EIMAAlert[] arr = new EIMAAlert[alerts.size()];
+        for (int i = 0; i < arr.length; i++) {
+        	arr[i] = alerts.get(i);
+        	System.out.println(alerts.get(i).getMessage());
+        }
+		return arr;
 	}
 
 	// MapAsset is an a super class for polygons, circles and pins. actions
@@ -590,7 +673,28 @@ public class DBQueries {
 		Connection db = DBConnection.getConnection();
 		String sql = "Update Map_objects set gps_x=null,gps_y=null,radius=null,x_array=null,y_array=null,notes=null " +
 				"where incident_id=" + incidentId +
-				" and client_side_id=" + clientSideId + ";";
+				" and client_side_id=" + sq(clientSideId) + ";";
+		try {
+			db.createStatement().execute(sql);
+		} catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("error: " + e.getErrorCode());
+        }
+		sql = "Select object_id from Map_objects where incident_id=" + incidentId +
+				" and client_side_id=" + sq(clientSideId) + ";";
+		int objectId = -1;
+		try {
+			ResultSet rs = db.createStatement().executeQuery(sql);
+			while (rs.next()) {
+				objectId = rs.getInt(1);
+			}
+		} catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("error: " + e.getErrorCode());
+        }
+		int event = registerNewEvent(token);
+		sql = "Insert into Map_events (event_id,object_id,gps_x,gps_y,x_array,y_array,radius,notes) values(" +
+				event + "," + objectId + ",null,null,null,null,null,null;";
 		try {
 			db.createStatement().execute(sql);
 		} catch (SQLException e) {
@@ -606,12 +710,35 @@ public class DBQueries {
 		String sql = "";
         try {
         	if (a instanceof EIMAAsset) {
-        		
+        		EIMAAsset asset = (EIMAAsset) a;
+        		int objectId = -1;
+        		sql = "Select object_id from Map_objects where incident_id=" + incidentId +
+        				" and client_side_id=" + sq(asset.getUsername()) + ";";
+        		ResultSet rs = db.createStatement().executeQuery(sql);
+        		while (rs.next()) {
+        			objectId = rs.getInt(1);
+        		}
+        		String x = null;
+        		String y = null;
+        		if (asset.getPosition() != null) {
+        			x = "" + asset.getPosition().getLatitude();
+        			y = "" + asset.getPosition().getLongitude();
+        		}
+        		sql = "Update Map_objects set gps_x=" + x + "," +
+        				"gps_y=" + y + "," +
+        				"status=" + sq(asset.getStatus()) +
+        				" where object_id=" + objectId + ";";
+        		db.createStatement().execute(sql);
+        		int eventId = registerNewEvent(token);
+        		sql = "Insert into Map_events (event_id, object_id, gps_x, gps_y, status) " +
+        		"values(" + eventId + "," + objectId + "," + x + "," +
+        		y + "," + sq(asset.getStatus()) + ");";
+        		db.createStatement().execute(sql);
         	} else if (a instanceof EIMACircle) {
         		EIMACircle circle = (EIMACircle) a;
         		int objectId = -1;
         		sql = "Select object_id from Map_objects where incident_id=" + incidentId +
-        				" and client_side_id=" + circle.getUid() + ";";
+        				" and client_side_id=" + sq(circle.getUid()) + ";";
         		ResultSet rs = db.createStatement().executeQuery(sql);
         		while (rs.next()) {
         			objectId = rs.getInt(1);
@@ -626,7 +753,31 @@ public class DBQueries {
         		sql = "Insert into Map_events (event_id, object_id, gps_x, gps_y, radius, notes) " +
         		"values(" + eventId + "," + objectId + "," + circle.getCenter().getLatitude() + "," +
         		circle.getCenter().getLongitude() + "," + circle.getRadius() + "," +
-        		circle.getNote() + ");";
+        		sq(circle.getNote()) + ");";
+        		db.createStatement().execute(sql);
+        	} else if (a instanceof EIMAPolygon) {
+        		EIMAPolygon poly = (EIMAPolygon) a;
+        		int objectId = -1;
+        		sql = "Select object_id from Map_objects where incident_id=" + incidentId +
+        				" and client_side_id=" + sq(poly.getUid()) + ";";
+        		ResultSet rs = db.createStatement().executeQuery(sql);
+        		while (rs.next()) {
+        			objectId = rs.getInt(1);
+        		}
+        		String[] coords = {"null","null"};
+        		if (poly.getPoints() != null) {
+        			coords = gpsStringify(poly.getPoints());
+        		}
+        		sql = "Update Map_objects set x_array=" + coords[0] + "," +
+        				"y_array=" + coords[1] + "," +
+        				"notes=" + sq(poly.getNote()) +
+        				" where object_id=" + objectId + ";";
+        		db.createStatement().execute(sql);
+        		int eventId = registerNewEvent(token);
+    			sql = "Insert into Map_events (event_id, object_id, x_array, y_array, notes) values( " +
+    					eventId + "," + objectId + "," + coords[0] + "," + coords[1] + "," +
+    					sq(poly.getNote()) + ");";
+    			db.createStatement().execute(sql);
         	}
         } catch (SQLException e) {
             e.printStackTrace();
@@ -653,28 +804,36 @@ public class DBQueries {
         		if (eimaAsset.isUser()){
         			sql = "Select incident_member from " +
             				"Members inner join Users on Members.incident_id=Users.current_incident "+
-            				"where Users.token=" + sq(token) + " limit 1;";
+        					"and Members.uid=Users.uid " +
+            				"where Users.token=" + sq(token) + ";";
                     rs = db.createStatement().executeQuery(sql);
                     while(rs.next()){
                     	incidentMember = rs.getString(1);
                     }
         		} // Will status and unit and stuff ever get updated?
+        		String x = null;
+        		String y = null;
+        		if (eimaAsset.getPosition() != null) {
+        			x = "" + (eimaAsset.getPosition().getLatitude());
+        			y = "" + (eimaAsset.getPosition().getLongitude());
+        		}
     			sql = "Insert into Map_objects (object_id, client_side_id, icon_type, incident, incident_member, gps_x, gps_y, notes," +
     					"status, unit, unit_type, organization, asset_name)" +
     					"values (" + objectId + "," + sq(eimaAsset.getUsername()) + "," +
     					sq("person") + "," + incidentId + "," +
-    					incidentMember + ",null,null,null," +
+    					incidentMember + "," + x + "," + y + "," + "null" + "," +
     					sq(eimaAsset.getStatus()) + "," + sq(eimaAsset.getUnit()) + "," + sq(eimaAsset.getUnitType()) + "," +
     					sq(eimaAsset.getOrganization()) + "," + sq(eimaAsset.getName()) + 
     					");";
     			db.createStatement().execute(sql);
     			int eventId = registerNewEvent(token);
+    			
     			sql = "Insert into Map_events (event_id, object_id, gps_x, gps_y, notes) values( " +
-    					eventId + "," + objectId + "," + "null,null,null);";
+    					eventId + "," + objectId + "," + x + "," + y + ",null);";
     			db.createStatement().execute(sql);
         	} else if (a instanceof EIMACircle) {
         		EIMACircle circle = (EIMACircle) a;
-        		sql = "Insert into Map_objects (object_id, client_side_id, icon_type, incident, gps_x, gps_y, radius, notes, circle_type) " +
+        		sql = "Insert into Map_objects (object_id, client_side_id, icon_type, incident, gps_x, gps_y, radius, notes, zone_type) " +
         		"values (" + objectId + "," + sq(circle.getUid()) + "," + sq("circle") + "," + incidentId +
         		"," + circle.getCenter().getLatitude() + "," + circle.getCenter().getLongitude() + "," +
         		circle.getRadius() + "," + sq(circle.getNote()) + "," + sq(circle.getType()) + ");";
@@ -684,8 +843,22 @@ public class DBQueries {
     					eventId + "," + objectId + "," + circle.getCenter().getLatitude() + "," + circle.getCenter().getLongitude() +
     					"," + circle.getRadius() + "," + sq(circle.getNote()) + ");";
     			db.createStatement().execute(sql);
-        	} else {
-        		System.out.println("polygon function not coded yet");
+        	} else if (a instanceof EIMAPolygon) {
+        		EIMAPolygon poly = (EIMAPolygon) a;
+        		String[] coords = {"null","null"};
+        		if (poly.getPoints() != null) {
+        			coords = gpsStringify(poly.getPoints());
+        		}
+        		sql = "Insert into Map_objects (object_id, client_side_id, icon_type, incident, x_array, y_array, notes, zone_type) " +
+        		"values (" + objectId + "," + sq(poly.getUid()) + "," + sq("poly") + "," + incidentId +
+        		"," + coords[0] + "," + coords[1] +
+        		sq(poly.getNote()) + "," + sq(poly.getType()) + ");";
+        		db.createStatement().execute(sql);
+        		int eventId = registerNewEvent(token);
+    			sql = "Insert into Map_events (event_id, object_id, x_array, y_array, notes) values( " +
+    					eventId + "," + objectId + "," + coords[0] + "," + coords[1] + "," +
+    					sq(poly.getNote()) + ");";
+    			db.createStatement().execute(sql);
         	}
         } catch (SQLException e) {
             e.printStackTrace();
@@ -753,8 +926,8 @@ public class DBQueries {
             while(rs.next()){
                 member = rs.getInt(1);
             }
-            sql = "Insert into Events (event_id, sender) " +
-            		"values(" + event + "," + member + ");";
+            sql = "Insert into Events (event_id, sender, time) " +
+            		"values(" + event + "," + member + "," + System.currentTimeMillis()+ ");";
             db.createStatement().execute(sql);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -768,6 +941,7 @@ public class DBQueries {
 		int memberId = -1;
 		String sql = "Select incident_member from " +
         		"Members m inner join Users u on m.incident_id = u.current_incident " +
+				"and m.uid = u.uid " +
         		"where token=" + sq(token) + ";";
 		try {
 			ResultSet rs = db.createStatement().executeQuery(sql);
@@ -779,5 +953,20 @@ public class DBQueries {
             System.out.println("error: " + e.getErrorCode());
         }
 		return memberId;
+	}
+	
+	private static String[] gpsStringify(GPSPosition[] arr) {
+		String[] s = {"{","{"};
+		int end = arr.length - 1;
+		for (int i = 0; i <= end; i++) {
+			if (i == end) {
+				s[0] += arr[i].getLatitude() + "}";
+				s[1] += arr[i].getLongitude() + "}";
+			} else {
+				s[0] += arr[i].getLatitude() + ",";
+				s[1] += arr[i].getLongitude() + ",";
+			}
+		}
+		return s;
 	}
 }
