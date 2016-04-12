@@ -17,7 +17,7 @@ public class EIMAAsset extends MapAsset {
 		super();
 	}
 
-	public EIMAAsset(String username, String name, String unit, GPS position, String organization, String status, String unitType,
+	public EIMAAsset(String username, String name, String unit, GPSPosition position, String organization, String status, String unitType,
 			boolean isUser) {
 		super();
 		this.uid = username;
