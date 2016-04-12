@@ -40,7 +40,7 @@ public class AuthUtils {
 
 		StringBuilder token = new StringBuilder();
 
-		token.append(convertHex(a));
+		token.append(a);
 		token.append("-");
 		token.append(uuid);
 
@@ -55,7 +55,7 @@ public class AuthUtils {
 		return DBQueries.getUserCurrentIncident(token);
 	}
 
-	private static String convertHex(long n) {
-		return Long.toHexString(n);
-	}
+	// private static String convertHex(long n) {
+	// return Long.toHexString(n);
+	// }
 }
