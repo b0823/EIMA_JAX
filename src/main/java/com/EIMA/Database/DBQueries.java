@@ -251,8 +251,17 @@ public class DBQueries {
 	// conflicts if its random.
 	public static int createIncidentFromData(String token, EIMAAsset[] assets, EIMACircle[] circles,
 			EIMAPolygon[] polygons) {
-		// TODO Auto-generated method stub
-		return 0;
+		int incident = createNewIncident(token);
+		for (EIMAAsset asset : assets) {
+			addMapAsset(asset, token);
+		}
+		for (EIMACircle circle : circles) {
+			addMapAsset(circle, token);
+		}
+		for (EIMAPolygon poly : polygons) {
+			addMapAsset(poly, token);
+		}
+		return incident;
 	}
 
 	// Returns true if a user is in an incident, false if not.
@@ -921,7 +930,7 @@ public class DBQueries {
 		if (s==null || s.equals("")){
 			return "null";
 		} else {
-			return "'" + s + "'";
+			return "'" + s.replaceAll("'", "") + "'";
 		}
 	}
 	
