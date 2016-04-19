@@ -81,8 +81,12 @@ public class IncidentDataRouting {
 			String token = json.getString("token");
 
 			if (DBQueries.tokenIsValid(token) && DBQueries.userIsInIncident(token)) {
-				GPSPosition location = new GPSPosition(25, 25); // TODO parse
-																// this out
+				
+				double latit = json.getDouble("latit");
+				double longit = json.getDouble("longit");
+
+				
+				GPSPosition location = new GPSPosition(latit, longit);
 				DBQueries.updateUserLocation(token, location);
 				return new ResultBase(true);
 			}
