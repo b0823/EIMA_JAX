@@ -173,27 +173,51 @@ public class DBQueries {
 		Connection db = DBConnection.getConnection();
 		String sql = "";
         try {
-        	sql = "values(nextval('incident_member_seq'));";
-            ResultSet rs = db.createStatement().executeQuery(sql);
-            int member = -1;
-            while(rs.next()){
-                member = rs.getInt(1);
-            }
-            
-            sql = "Select uid from Users where token=" + sq(token) + ";";
-            rs = db.createStatement().executeQuery(sql);
-            int uid = 0;
-            while(rs.next()){
-                uid = rs.getInt(1);
-            }
-            
-            sql = "Insert into Members values(" +
-            		member + "," + uid + "," + incidentID + ",0);" 
-            		;
-            db.createStatement().execute(sql);
-            
-            setUserCurrentIncident(token, incidentID);
-            
+        	sql = "select uid from users where token=" + sq(token) + ";";
+        	ResultSet rs = db.createStatement().executeQuery(sql);
+        	int uid = -1;
+        	while (rs.next()) {
+        		uid = rs.getInt(1);
+        	}
+        	sql = "select incident_member from members where " +
+        			"uid=" + uid + " and incident_id=" + incidentID + ";";
+        	rs = db.createStatement().executeQuery(sql);
+        	String member = "null";
+        	while (rs.next()) {
+        		member = rs.getString(1);
+        	}
+        	if (member == null || member.equalsIgnoreCase("null")) {
+        		
+	        	sql = "values(nextval('incident_member_seq'));";
+	            rs = db.createStatement().executeQuery(sql);
+	            while(rs.next()){
+	                member = rs.getString(1);
+	            }
+	            
+	            /*sql = "Select uid from Users where token=" + sq(token) + ";";
+	            rs = db.createStatement().executeQuery(sql);
+	            int uid = 0;
+	            while(rs.next()){
+	                uid = rs.getInt(1);
+	            }*/
+	            
+	            sql = "Insert into Members values(" +
+	            		member + "," + uid + "," + incidentID + ",0);" 
+	            		;
+	            db.createStatement().execute(sql);
+	            
+	            EIMAProfile user = getUserProfile(token);
+	            EIMAAsset userAsset = new EIMAAsset(
+	            		user.getName(),user.getName(),user.getUnit(), null,
+	            		user.getOrganization(),user.getStatus(),user.getUnitType(),
+	            		true
+	            );
+	            setUserCurrentIncident(token, incidentID);
+	            addMapAsset(userAsset, token);
+        	}
+        	else {
+        		setUserCurrentIncident(token, incidentID);
+        	}
             /*sql = "Select uname from Users where token=" + sq(token) + ";";
             rs = db.createStatement().executeQuery(sql);
             String uname = "";
@@ -201,14 +225,6 @@ public class DBQueries {
                 uname = rs.getString(1);
             }
             System.out.println("uname: " + uname);*/
-            
-            EIMAProfile user = getUserProfile(token);
-            EIMAAsset userAsset = new EIMAAsset(
-            		user.getName(),user.getName(),user.getUnit(), null,
-            		user.getOrganization(),user.getStatus(),user.getUnitType(),
-            		true
-            );
-            addMapAsset(userAsset, token);
             
         } catch (SQLException e) {
             e.printStackTrace();
