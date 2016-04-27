@@ -48,7 +48,7 @@ public class AdminRouting {
 			String message = json.getString("message");
 
 			if (DBQueries.tokenIsValid(token) && DBQueries.userIsInIncident(token)
-					&& AuthUtils.hasPrivlege(token, AuthUtils.Privlege.admin)) {
+					&& AuthUtils.hasPrivlege(token, AuthUtils.Privlege.user)) {
 				DBQueries.sendMessageTo(token, user, message);
 				return new ResultBase(true);
 			}
