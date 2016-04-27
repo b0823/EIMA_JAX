@@ -42,9 +42,15 @@ public class UsersRouting {
 		try {
 			String token = json.getString("token");
 
-			EIMAProfile profile = null;// TODO add code to parse this.
 
 			if (DBQueries.tokenIsValid(token) && DBQueries.userIsInIncident(token)) {
+				EIMAProfile profile = new EIMAProfile();// TODO add code to parse this.
+				profile.setName(json.getString("name"));
+				profile.setOrganization(json.getString("organization"));
+				profile.setStatus(json.getString("status"));
+				profile.setUnit(json.getString("unit"));
+				profile.setUnitType(json.getString("unitType"));
+				
 				DBQueries.setUserProfile(token, profile);
 				return new ResultBase(true);
 			}

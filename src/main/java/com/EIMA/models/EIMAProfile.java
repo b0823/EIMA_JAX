@@ -20,6 +20,10 @@ public class EIMAProfile {
 		this.unitType = unitType;
 	}
 
+	public EIMAProfile() {
+		// TODO Auto-generated constructor stub
+	}
+
 	public String getName() {
 		return name;
 	}
