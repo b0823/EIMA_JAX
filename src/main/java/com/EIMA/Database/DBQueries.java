@@ -645,6 +645,9 @@ public class DBQueries {
             while(rs.next()){
             	recipientId = rs.getString(1);
             }
+            if (recipientId == null || recipientId.equalsIgnoreCase("null")) {
+            	return false;
+            }
             
             int eventId = registerNewEvent(token);            
             sql = "Insert into Permission_events values(" +
