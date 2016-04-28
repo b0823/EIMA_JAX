@@ -59,7 +59,7 @@ public class TestDB {
 		joinIncident(incident1, tokens[1]);
 		System.out.println("Members in mark's incident:");
 		displayIncidentMembers(tokens[0]);
-		setPrivilege(tokens[0], users[1], 2);
+		setPrivilege(tokens[0], users[1], "mapEditor");
 		alert(tokens[0], users[1], "Shut up foo");
 		alert(tokens[1], users[0], "You shut up!");
 		readAlerts(tokens[1]);
@@ -83,8 +83,8 @@ public class TestDB {
 		System.out.println("Started incident 2");
 		joinIncident(incident2, tokens[1]);
 		joinIncident(incident2, tokens[3]);
-		setPrivilege(tokens[2], users[3], 3);
-		setPrivilege(tokens[2], users[1], 1);
+		setPrivilege(tokens[2], users[3], "admin");
+		setPrivilege(tokens[2], users[1], "user");
 		circle1 = new EIMACircle("circ1", new GPSPosition(1000,1000), 30.2, "big, scary","fire");
 		circle2 = new EIMACircle("circ2", new GPSPosition(1000,500), 1.3, "","flood");
 		GPSPosition[] polyCoords1 = {new GPSPosition(1,1), new GPSPosition(2,5), new GPSPosition(3,7)}; 
@@ -102,8 +102,9 @@ public class TestDB {
 		seeAssets(tokens[1]);
 		System.out.println("Incident1 assets");
 		seeAssets(tokens[0]);
-		alert(tokens[1], null, "I can fly");
+		alert(tokens[1], "USERS", "I can fly");
 		alert(tokens[2], users[3], "Hello");
+		alert(tokens[3], "ADMINS", "are you an admin?");
 		System.out.println("alerts:");
 		System.out.println(users[0]);
 		readAlerts(tokens[0]);
@@ -190,8 +191,9 @@ public class TestDB {
 			System.out.println("Privilege:" + m.getPrivLevel());
 		}
 	}
-	public void setPrivilege(String token, String user, int priv) {
-		DBQueries.modifyPrivlege(token, user, "" + priv);
+	public void setPrivilege(String token, String user, String priv) {
+		
+		DBQueries.modifyPrivlege(token, user, priv);
 	}
 	public void alert(String token, String target, String msg) {
 		DBQueries.sendMessageTo(token, target, msg);

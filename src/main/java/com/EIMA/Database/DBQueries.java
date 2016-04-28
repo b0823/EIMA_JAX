@@ -587,6 +587,10 @@ public class DBQueries {
 	// Adds a message to a user. Uses other persons username.
 	public static void sendMessageTo(String token, String user, String message) {
 		int event = registerNewEvent(token);
+		String toAdmins = (user != null && user.equals("ADMINS")) ? "TRUE" : "FALSE";
+		if (user != null && (user.equals("USERS") || user.equals("ADMINS"))) {
+			user = null;
+		}
 		Connection db = DBConnection.getConnection();
 		String sql = "";
         try {
@@ -600,7 +604,7 @@ public class DBQueries {
                 recipient = rs.getString(1);
             }
             sql = "Insert into Message_events values (" +
-            		event + "," + recipient + "," + sq(message) + ");";
+            		event + "," + recipient + "," + toAdmins + "," + sq(message) + ");";
             db.createStatement().execute(sql);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -614,6 +618,14 @@ public class DBQueries {
 		Connection db = DBConnection.getConnection();
 		String sender = "";
 		String sql = "";
+		int priv = 0;
+		if (privLevel.equalsIgnoreCase("admin")) {
+			priv = 3;
+		} else if (privLevel.equalsIgnoreCase("mapEditor")) {
+			priv = 2;
+		} else if (privLevel.equalsIgnoreCase("user")) {
+			priv = 1;
+		}
         try {
 	        	sql = "Select uname from Users where token=" + sq(token) + ";";
 	        	ResultSet rs = db.createStatement().executeQuery(sql);
@@ -636,10 +648,10 @@ public class DBQueries {
             
             int eventId = registerNewEvent(token);            
             sql = "Insert into Permission_events values(" +
-            		eventId + "," + recipientId + "," + privLevel + ");";
+            		eventId + "," + recipientId + "," + priv + ");";
             db.createStatement().execute(sql);
             
-            sql = "Update Members set permission=" + privLevel +
+            sql = "Update Members set permission=" + priv +
             		" where incident_member=" + recipientId + ";";
             db.createStatement().execute(sql);
         } catch (SQLException e) {
@@ -665,14 +677,19 @@ public class DBQueries {
             }*/
             int member = getMemberId(token);
             int incidentId = getUserCurrentIncident(token);
+            AuthUtils.Privlege priv = getUserCurrIncidentPrivLevel(token);
             
             sql = "Select Users.uname, Events.time, Message_events.message from " +
             		"Users inner join Members on Users.uid=Members.uid " +
             		"inner join Events on Members.incident_member=Events.sender " +
             		"inner join Message_events on Events.event_id=Message_events.event_id " +
             		"where Members.incident_id=" + incidentId +
-            		" and (Message_events.recipient=" + member +
-            		" or Message_events.recipient is null);";
+            		" and (Message_events.recipient=" + member;
+            if (priv == AuthUtils.Privlege.admin) {
+            	sql += " or Message_events.recipient is null);";
+            } else {
+            	sql += " or (Message_events.recipient is null and Message_events.to_admins=FALSE));";
+            }
             ResultSet rs = db.createStatement().executeQuery(sql);
             while (rs.next()) {
             	String uname = rs.getString(1);

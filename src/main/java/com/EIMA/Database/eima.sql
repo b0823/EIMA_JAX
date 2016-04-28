@@ -99,6 +99,7 @@ create table Permission_events (
 create table Message_events (
     event_id integer unique primary key,
     recipient integer,
+    to_admins boolean,
     message text,
     foreign key (event_id) references Events(event_id),
     foreign key (recipient) references Members(incident_member)
@@ -115,3 +116,4 @@ create sequence incident_id_seq increment by 1 minvalue 0 start with 0 no cycle;
 create sequence event_id_seq increment by 1 minvalue 0 start with 0 no cycle;
 create sequence object_id_seq increment by 1 minvalue 0 start with 0 no cycle;
 create sequence incident_member_seq increment by 1 minvalue 0 start with 0 no cycle;
+
