@@ -14,7 +14,7 @@ import com.EIMA.models.MapAsset;
 
 public class TestDB {
 	String[] users = {"mark", "robert", "brad", "marie"};
-	String[] passwords = {"a'", "b", "c", "d"};
+	String[] passwords = {"a", "b", "c", "d"};
 	String[] tokens = {"abc", "def", "ghi", "jkl"};
 	EIMAAsset asset1;
 	EIMAAsset asset2;
@@ -43,6 +43,13 @@ public class TestDB {
 			db.createStatement().execute(sql);
 		} catch (SQLException e) {
 			System.out.println("Unable to delete table entries.");
+		}
+	}
+	
+	public void cleanup() {
+		for (String s : tokens) {
+			DBQueries.removeUserFromIncident(s);
+			DBQueries.removeUserToken(s);
 		}
 	}
 
@@ -153,6 +160,8 @@ public class TestDB {
 		System.out.println("Incident 3:");
 		seeAssets(tokens[3]);
 		displayIncidentMembers(tokens[3]);
+		
+		cleanup();
 	}
 	public boolean addUsers() {
 		boolean success = true;
