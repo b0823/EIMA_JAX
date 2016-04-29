@@ -25,7 +25,7 @@ public class MapEditRouting {
 	public ResultBase addAssetInfo(JSONObject json) {
 		try {
 			String token = json.getString("token");
-
+			System.out.println(json.toString());
 			if (DBQueries.tokenIsValid(token) && DBQueries.userIsInIncident(token)
 					&& AuthUtils.hasPrivlege(token, AuthUtils.Privlege.mapEditor)) {
 				
